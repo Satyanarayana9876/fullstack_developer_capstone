@@ -1,12 +1,12 @@
 # Uncomment the required imports before adding the code
 
-# from django.shortcuts import render
-# from django.http import HttpResponseRedirect, HttpResponse
-# from django.contrib.auth.models import User
-# from django.shortcuts import get_object_or_404, render, redirect
-# from django.contrib.auth import logout
-# from django.contrib import messages
-# from datetime import datetime
+from django.shortcuts import render
+from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth import logout
+from django.contrib import messages
+from datetime import datetime
 
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate
@@ -88,8 +88,19 @@ def get_cars(request):
     return JsonResponse({"CarModels":cars})
 # # Update the `get_dealerships` view to render the index page with
 # a list of dealerships
-# def get_dealerships(request):
-# ...
+def get_dealerships(request):
+    # Path to the JSON file
+    json_file_path = os.path.join(settings.BASE_DIR, 'dealerships.json')
+
+    # Open and load the JSON data
+    with open(json_file_path, 'r') as json_file:
+        data = json.load(json_file)
+
+    # Pass the dealerships to the template
+    dealerships = data['dealerships']
+    
+    return render(request, 'index.html', {'dealerships': dealerships})
+    
 
 # Create a `get_dealer_reviews` view to render the reviews of a dealer
 # def get_dealer_reviews(request,dealer_id):
@@ -97,8 +108,6 @@ def get_cars(request):
 
 # Create a `get_dealer_details` view to render the dealer details
 # def get_dealer_details(request, dealer_id):
-# ...
 
 # Create a `add_review` view to submit a review
 # def add_review(request):
-# ...
