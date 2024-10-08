@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import "./Dealers.css";
 import "../assets/style.css";
 import Header from '../Header/Header';
-import PostReview from "./components/Dealers/PostReview"
 
 
 const PostReview = () => {
@@ -22,21 +21,23 @@ const PostReview = () => {
   let review_url = root_url+`djangoapp/add_review`;
   let carmodels_url = root_url+`djangoapp/get_cars`;
 
-  const postreview = async ()=>{
-    let name = sessionStorage.getItem("firstname")+" "+sessionStorage.getItem("lastname");
-    //If the first and second name are stores as null, use the username
-    if(name.includes("null")) {
+  const postreview = async () => {
+    let name = sessionStorage.getItem("firstname") + " " + sessionStorage.getItem("lastname");
+  
+    // If the first and second name are stored as null, use the username
+    if (name.includes("null")) {
       name = sessionStorage.getItem("username");
     }
-    if(!model || review === "" || date === "" || year === "" || model === "") {
-      alert("All details are mandatory")
+  
+    if (!model || review === "" || date === "" || year === "" || model === "") {
+      alert("All details are mandatory");
       return;
     }
-
+  
     let model_split = model.split(" ");
     let make_chosen = model_split[0];
     let model_chosen = model_split[1];
-
+  
     let jsoninput = JSON.stringify({
       "name": name,
       "dealership": id,
@@ -47,29 +48,50 @@ const PostReview = () => {
       "car_model": model_chosen,
       "car_year": year,
     });
-
-    console.log(jsoninput);
-    const res = await fetch(review_url, {
-      method: "POST",
-      headers: {
+  
+    console.log(jsoninput);  // Logging the input payload
+  
+    try {
+      const res = await fetch(review_url, {
+        method: "POST",
+        headers: {
           "Content-Type": "application/json",
-      },
-      body: jsoninput,
-  });
-
-  const json = await res.json();
-  if (json.status === 200) {
-      window.location.href = window.location.origin+"/dealer/"+id;
-  }
-
-  }
+        },
+        body: jsoninput,
+      });
+  
+      // Check if the response is okay
+      if (res.ok) {
+        // Since res.json() can only be called once, we store it in a variable.
+        const json = await res.json();
+        console.log("Parsed response:", json);
+  
+        if (json.status === 200) {
+          window.location.href = window.location.origin + "/dealer/" + id;
+        } else {
+          alert("Failed to submit review. Try again.");
+        }
+      } else {
+        // If the response is not okay, we can log the raw text or error message once
+        const errorMessage = await res.text();
+        console.error("Error response:", errorMessage);
+        alert("Server returned an error. Please check the server logs.");
+      }
+  
+    } catch (error) {
+      console.error("Fetch error:", error);
+      alert("An error occurred while submitting the review.");
+    }
+  };
+  
   const get_dealer = async ()=>{
     const res = await fetch(dealer_url, {
       method: "GET"
     });
+    if (!res.ok) throw new Error(`Failed to fetch dealer: ${res.statusText}`);
     const retobj = await res.json();
     
-    if(retobj.status === 200) {
+    if(retobj.status === 200 && retobj.dealer.length > 0) {
       let dealerobjs = Array.from(retobj.dealer)
       if(dealerobjs.length > 0)
         setDealer(dealerobjs[0])
@@ -80,6 +102,7 @@ const PostReview = () => {
     const res = await fetch(carmodels_url, {
       method: "GET"
     });
+    if (!res.ok) throw new Error(`Failed to fetch car models: ${res.statusText}`);
     const retobj = await res.json();
     
     let carmodelsarr = Array.from(retobj.CarModels)

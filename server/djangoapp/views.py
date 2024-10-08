@@ -15,7 +15,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from .models import CarMake, CarModel
 from .populate import initiate
-from .restapis import get_request, analyze_review_sentiments, post_review
+from .restapis import get_request, analyze_review_sentiments, post_review, backend_url,sentiment_analyzer_url
 
 
 # Get an instance of a logger
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 # Create your views here.
-
+#backend_url='https://statapud-3030.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai'
 # Create a `login_request` view to handle sign in request
 @csrf_exempt
 def login_user(request):
@@ -124,11 +124,37 @@ def get_dealer_details(request, dealer_id):
         return JsonResponse({"status":400,"message":"Bad Request"})
 
 # Create a `add_review` view to submit a review
+@csrf_exempt
 def add_review(request):
     request_url = backend_url+"/insert_review"
-    try:
-        response = requests.post(request_url,json=data_dict)
-        print(response.json())
-        return response.json()
-    except:
-        print("Network exception occurred")
+    if request.method == 'POST':
+        try:
+            # Parse the incoming JSON data
+            data = json.loads(request.body)
+            
+            # Prepare the data for the review
+            data_dict = {
+                "name": data.get('name'),
+                "dealership": data.get('dealership'),
+                "review": data.get('review'),
+                "purchase": data.get('purchase'),
+                "purchase_date": data.get('purchase_date'),
+                "car_make": data.get('car_make'),
+                "car_model": data.get('car_model'),
+                "car_year": data.get('car_year')
+            }
+
+            # Post the review to the backend
+            response = request.post(request_url, json=data_dict)
+            
+            # Check if the request was successful
+            if response.status_code == 200:
+                return JsonResponse(response.json(), status=200)
+            else:
+                return JsonResponse({"error": "Failed to submit review to backend"}, status=response.status_code)
+
+        except Exception as e:
+            print(f"Unexpected error occurred: {e}")
+            return JsonResponse({"error": "An unexpected error occurred"}, status=500)
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=405)
