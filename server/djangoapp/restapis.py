@@ -7,16 +7,16 @@ load_dotenv()
 
 backend_url = os.getenv(
     'backend_url',
-default="https://statapud-3030.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai")
+    default="https://statapud-3030.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai")
 sentiment_analyzer_url = os.getenv(
     'sentiment_analyzer_url',
-default="https://sentianalyzer.1mrruttf5bdy.us-south.codeengine.appdomain.cloud/")
+    default="https://sentianalyzer.1mrruttf5bdy.us-south.codeengine.appdomain.cloud/")
 
 
 # Add code for get requests to back end
 def get_request(endpoint, **kwargs):
     params = ""
-    if(kwargs):
+    if(kwargs): 
         for key, value in kwargs.items():
             params = params + key + "=" + value + "&"
     request_url = backend_url+endpoint+"?"+params
