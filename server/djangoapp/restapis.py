@@ -1,4 +1,3 @@
-# Uncomment the imports below before you add the function code
 import requests
 import os
 from dotenv import load_dotenv
@@ -6,22 +5,24 @@ from dotenv import load_dotenv
 load_dotenv()
 
 backend_url = os.getenv(
-    'backend_url',
-    default="https://statapud-3030.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai"
+    'backend_url', 
+    default="https://statapud-3030.theiadockernext-1-labs-prod-theiak8s-4-tor01"
+            ".proxy.cognitiveclass.ai"
 )
 sentiment_analyzer_url = os.getenv(
-    'sentiment_analyzer_url',
-    default="https://sentianalyzer.1mrruttf5bdy.us-south.codeengine.appdomain.cloud/"
+    'sentiment_analyzer_url', 
+    default="https://sentianalyzer.1mrruttf5bdy.us-south.codeengine"
+            ".appdomain.cloud/"
 )
 
 
 # Add code for get requests to back end
 def get_request(endpoint, **kwargs):
     params = ""
-    if kwargs: 
+    if kwargs:
         for key, value in kwargs.items():
-            params = params + key + "=" + value + "&"
-    request_url = backend_url+endpoint+"?"+params
+            params += key + "=" + value + "&"
+    request_url = backend_url + endpoint + "?" + params
     print("GET from {} ".format(request_url))
     try:
         # Call get method of requests library with URL and parameters
@@ -33,7 +34,7 @@ def get_request(endpoint, **kwargs):
 
 # Add code for retrieving sentiments
 def analyze_review_sentiments(text):
-    request_url = sentiment_analyzer_url+"analyze/"+text
+    request_url = sentiment_analyzer_url + "analyze/" + text
     try:
         # Call get method of requests library with URL and parameters
         response = requests.get(request_url)
