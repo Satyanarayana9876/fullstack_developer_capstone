@@ -21,6 +21,13 @@ const PostReview = () => {
   let review_url = root_url+`djangoapp/add_review`;
   let carmodels_url = root_url+`djangoapp/get_cars`;
 
+  const getCSRFToken = () => {
+    let csrfCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='));
+    return csrfCookie ? csrfCookie.split('=')[1] : null;
+};
+
   const postreview = async () => {
     let name = sessionStorage.getItem("firstname") + " " + sessionStorage.getItem("lastname");
   
@@ -52,10 +59,12 @@ const PostReview = () => {
     console.log(jsoninput);  // Logging the input payload
   
     try {
+        let authToken = sessionStorage.getItem("authToken"); 
       const res = await fetch(review_url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${authToken}`
         },
         body: jsoninput,
       });

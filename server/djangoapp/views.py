@@ -1,11 +1,8 @@
 # Uncomment the required imports before adding the code
 
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import logout
-from django.contrib import messages
 from datetime import datetime
 
 from django.http import JsonResponse
@@ -124,37 +121,14 @@ def get_dealer_details(request, dealer_id):
         return JsonResponse({"status":400,"message":"Bad Request"})
 
 # Create a `add_review` view to submit a review
-@csrf_exempt
+# @csrf_exempt
 def add_review(request):
-    request_url = backend_url+"/insert_review"
-    if request.method == 'POST':
+    if(request.user.is_anonymous == False):
+        data = json.loads(request.body)
         try:
-            # Parse the incoming JSON data
-            data = json.loads(request.body)
-            
-            # Prepare the data for the review
-            data_dict = {
-                "name": data.get('name'),
-                "dealership": data.get('dealership'),
-                "review": data.get('review'),
-                "purchase": data.get('purchase'),
-                "purchase_date": data.get('purchase_date'),
-                "car_make": data.get('car_make'),
-                "car_model": data.get('car_model'),
-                "car_year": data.get('car_year')
-            }
-
-            # Post the review to the backend
-            response = request.post(request_url, json=data_dict)
-            
-            # Check if the request was successful
-            if response.status_code == 200:
-                return JsonResponse(response.json(), status=200)
-            else:
-                return JsonResponse({"error": "Failed to submit review to backend"}, status=response.status_code)
-
-        except Exception as e:
-            print(f"Unexpected error occurred: {e}")
-            return JsonResponse({"error": "An unexpected error occurred"}, status=500)
+            response = post_review(data)
+            return JsonResponse({"status":200})
+        except:
+            return JsonResponse({"status":401,"message":"Error in posting review"})
     else:
-        return JsonResponse({"error": "Invalid request method"}, status=405)
+        return JsonResponse({"status":403,"message":"Unauthorized"})
