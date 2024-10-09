@@ -6,11 +6,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 backend_url = os.getenv(
-    'backend_url', 
-    default="https://statapud-3030.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai")
+    'backend_url',
+default="https://statapud-3030.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai")
 sentiment_analyzer_url = os.getenv(
     'sentiment_analyzer_url',
-    default="https://sentianalyzer.1mrruttf5bdy.us-south.codeengine.appdomain.cloud/")
+default="https://sentianalyzer.1mrruttf5bdy.us-south.codeengine.appdomain.cloud/")
 
 
 # Add code for get requests to back end
@@ -45,9 +45,8 @@ def analyze_review_sentiments(text):
 def post_review(data_dict):
     request_url = backend_url + "/insert_review"
     try:
-        response = requests.post(request_url,json=data_dict)
+        response = requests.post(request_url, json=data_dict)
         print(response.json())
         return response.json()
     except Exception as e:
         print(f"Error: {e}")
-
